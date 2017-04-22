@@ -14,8 +14,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.listen(port);
 
-mongoose.connect('mongodb://' + process.env.DB_USER + ':' 
-                              + process.env.DB_PASS + '@ds115131.mlab.com:15131/game');
+mongoose.connect(process.env.MONGODB_URI);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -28,8 +27,6 @@ var userSchema = mongoose.Schema({
     number: Number
 });
 var User = mongoose.model('User', userSchema);
-
-
 
 app.get('/', function(req, res) {
     res.send('it works');
