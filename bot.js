@@ -120,11 +120,9 @@ function sendGenericMessage(recipientId, messageText) {
 }
 
 function sendTextMessage(recipientId, messageText) {
-    var messageResult = 'Hmm.';
-
     User.findOne({id: recipientId}, function(user) {
         if (user) {
-            messageResult = checkMessage(messageText, user.number);
+            var messageResult = checkMessage(messageText, user.number);
             console.log(messageResult);
 
             if (parseInt(messageText) === user.number) {
@@ -136,7 +134,7 @@ function sendTextMessage(recipientId, messageText) {
             User.create({id: recipientId}).then(function(user) {
                 user.generateNumber();
 
-                messageResult = checkMessage(messageText, user.number);
+                var messageResult = checkMessage(messageText, user.number);
                 if (parseInt(messageText) === user.number) {
                     sendGenericMessage();
                     user.generateNumber();
