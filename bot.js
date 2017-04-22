@@ -16,17 +16,11 @@ app.listen(port);
 
 mongoose.connect(process.env.MONGODB_URI);
 
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-    console.log('connected');
-});
-
 var userSchema = mongoose.Schema({
     id: String,
     number: Number
 });
-userSchema.generateNumber = function() {
+userSchema.methods.generateNumber = function() {
     this.number = Math.floor(Math.random() * 1000) + 1;
 };
 var User = mongoose.model('User', userSchema);
@@ -133,13 +127,20 @@ function sendTextMessage(recipientId, messageText) {
             messageText = checkMessage(messageText, user.number);
 
             if (parseInt(message) === user.number) {
+                sendGenericMessage();
                 user.generateNumber();
                 user.save();
             }
         } else {
-            User.create({id: recipientId}, function(user) {
+            User.create({id: recipientId}).then(function(user) {
                 user.generateNumber();
+
                 messageText = checkMessage(messageText, user.number);
+                if (parseInt(message) === user.number) {
+                    sendGenericMessage();
+                    user.generateNumber();
+                }
+
                 user.save();
             });
         }
