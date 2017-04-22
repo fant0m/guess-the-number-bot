@@ -180,6 +180,7 @@ function callSendAPI(messageData) {
 }
 
 function checkMessage(message, number) {
+    console.log(message+","+number);
     var message = parseInt(message);
 
     if (!message || isNan(message)) {
