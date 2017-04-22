@@ -125,6 +125,7 @@ function sendTextMessage(recipientId, messageText) {
     User.findOne({id: recipientId}, function(user) {
         if (user) {
             messageResult = checkMessage(messageText, user.number);
+            console.log(messageResult);
 
             if (parseInt(messageText) === user.number) {
                 sendGenericMessage();
@@ -184,6 +185,8 @@ function checkMessage(message, number) {
     var message = parseInt(message);
     console.log(message+","+number);
     console.log(message < number);
+    console.log(typeof message);
+    console.log(typeof number);
 
     if (!message || isNan(message)) {
         return 'Please guess the number between 1 and 1000.';
