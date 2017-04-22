@@ -1,8 +1,10 @@
-const VERIFY_TOKEN = 'dont_worry_its_correct';
 const express = require('express');
 const app = express();
 
-app.listen(3000);
+const port = process.env.PORT || 8080;
+const VERIFY_TOKEN = 'dont_worry_its_correct';
+
+app.listen(port);
 
 app.get('/', function(req, res) {
     res.send('it works');
