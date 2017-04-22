@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 
 const port = process.env.PORT || 8080;
 const VERIFY_TOKEN = 'dont_worry_its_correct';
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.listen(port);
 
 app.get('/', function(req, res) {
