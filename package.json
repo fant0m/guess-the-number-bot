@@ -1,0 +1,22 @@
+{
+  "name": "guess-the-number-bot",
+  "version": "1.0.0",
+  "description": "Guess the number bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fant0m/guess-the-number-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fant0m/guess-the-number-bot/issues"
+  },
+  "homepage": "https://github.com/fant0m/guess-the-number-bot#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
