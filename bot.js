@@ -23,8 +23,19 @@ db.once('open', function() {
     console.log('connected');
 });
 
+var userSchema = mongoose.Schema({
+    id: String,
+    number: Number
+});
+var User = mongoose.model('User', userSchema);
+
+
+
 app.get('/', function(req, res) {
     res.send('it works');
+
+    var user = new User({id: 'abc', number: 123});
+    user.save();
 });
 
 app.get('/webhook', function(req, res) {
