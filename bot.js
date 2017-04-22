@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const port = process.env.PORT || 8080;
-const VERIFY_TOKEN = 'dont_worry_its_correct';
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 
 app.use(bodyParser.json());
@@ -120,13 +120,13 @@ function sendGenericMessage(recipientId, messageText) {
 }
 
 function sendTextMessage(recipientId, messageText) {
-    var messageText = 'Hmm.';
+    var messageResult = 'Hmm.';
 
     User.findOne({id: recipientId}, function(user) {
         if (user) {
-            messageText = checkMessage(messageText, user.number);
+            messageResult = checkMessage(messageText, user.number);
 
-            if (parseInt(message) === user.number) {
+            if (parseInt(messageText) === user.number) {
                 sendGenericMessage();
                 user.generateNumber();
                 user.save();
@@ -135,8 +135,8 @@ function sendTextMessage(recipientId, messageText) {
             User.create({id: recipientId}).then(function(user) {
                 user.generateNumber();
 
-                messageText = checkMessage(messageText, user.number);
-                if (parseInt(message) === user.number) {
+                messageResult = checkMessage(messageText, user.number);
+                if (parseInt(messageText) === user.number) {
                     sendGenericMessage();
                     user.generateNumber();
                 }
@@ -151,7 +151,7 @@ function sendTextMessage(recipientId, messageText) {
             id: recipientId
         },
         message: {
-            text: messageText
+            text: messageResult
         }
     };
 
