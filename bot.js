@@ -26,13 +26,13 @@ var userSchema = mongoose.Schema({
     id: String,
     number: Number
 });
+userSchema.generateNumber = function() {
+    this.number = Math.floor(Math.random() * 1000) + 1;
+};
 var User = mongoose.model('User', userSchema);
 
 app.get('/', function(req, res) {
     res.send('it works');
-
-    var user = new User({id: 'abc', number: 123});
-    user.save();
 });
 
 app.get('/webhook', function(req, res) {
@@ -55,8 +55,6 @@ app.post('/webhook', function (req, res) {
             entry.messaging.forEach(function(event) {
                 if (event.message) {
                     receivedMessage(event);
-                } else {
-                    console.log("Webhook received unknown event: ", event);
                 }
             });
         });
@@ -128,6 +126,25 @@ function sendGenericMessage(recipientId, messageText) {
 }
 
 function sendTextMessage(recipientId, messageText) {
+    var messageText = 'Hmm.';
+
+    User.findOne({id: recipientId}, function(user) {
+        if (user) {
+            messageText = checkMessage(messageText, user.number);
+
+            if (parseInt(message) === user.number) {
+                user.generateNumber();
+                user.save();
+            }
+        } else {
+            User.create({id: recipientId}, function(user) {
+                user.generateNumber();
+                messageText = checkMessage(messageText, user.number);
+                user.save();
+            });
+        }
+    });
+
     var messageData = {
         recipient: {
             id: recipientId
@@ -148,15 +165,31 @@ function callSendAPI(messageData) {
         json: messageData
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-        var recipientId = body.recipient_id;
-        var messageId = body.message_id;
+            var recipientId = body.recipient_id;
+            var messageId = body.message_id;
 
-        console.log("Successfully sent generic message with id %s to recipient %s", 
-            messageId, recipientId);
+            console.log('Successfully sent generic message with id %s to recipient %s', 
+                messageId, recipientId);
         } else {
-            console.error("Unable to send message.");
+            console.error('Unable to send message.');
             console.error(response);
             console.error(error);
         }
     });  
+}
+
+function checkMessage(message, number) {
+    var message = parseInt(message);
+
+    if (!message || isNan(message)) {
+        return 'Please guess the number between 1 and 1000.';
+    } else if (message < number) {
+        return 'Your number is smaller than the chosen one.';
+    } else if (message > number) {
+        return 'Your number is bigger than the chosen one.';
+    } else if (message == number) {
+        return 'Well played! You have successfully guessed the right number.';
+    }
+
+    return 'Hmm.';
 }
