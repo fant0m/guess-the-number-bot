@@ -182,6 +182,8 @@ function callSendAPI(messageData) {
 function checkMessage(message, number) {
     console.log(message+","+number);
     var message = parseInt(message);
+    console.log(message+","+number);
+    console.log(message < number);
 
     if (!message || isNan(message)) {
         return 'Please guess the number between 1 and 1000.';
@@ -191,7 +193,7 @@ function checkMessage(message, number) {
         return 'Your number is bigger than the chosen one.';
     } else if (message == number) {
         return 'Well played! You have successfully guessed the right number.';
+    } else {
+        return 'Hmm.';
     }
-
-    return 'Hmm.';
 }
