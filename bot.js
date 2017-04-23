@@ -100,7 +100,9 @@ function checkUserMessage(user, messageText) {
     } else if (check > user.number) {
         sendTextMessage(user.id, 'Your number is bigger than the chosen one.');
     } else if (check === user.number) {
-        sendGenericMessage(user.id, 'Well played! You have successfully guessed the right number. New number has been generated.');
+        sendGenericMessage(user.id, function() {
+            sendTextMessage(user.id, 'Well played! You have successfully guessed the right number. New number has been generated.');
+        });
         user.generateNumber();
         user.save();
     } else {
@@ -108,23 +110,23 @@ function checkUserMessage(user, messageText) {
     }
 }
 
-function sendGenericMessage(recipientId, messageText) {
+function sendGenericMessage(recipientId, callback) {
     var messageData = {
         recipient: {
             id: recipientId
         },
         message: {
-            text: messageText,
             attachment: {
                 type: 'image',
                 payload: {
-                    'url': 'https://pbs.twimg.com/profile_images/665915626850902016/Zp5lUnYl.jpg'
+                    'url': 'https://pbs.twimg.com/profile_images/665915626850902016/Zp5lUnYl.jpg',
+                    'is_reusable': true
                 }
             }
         }
     };  
 
-    callSendAPI(messageData);
+    callSendAPI(messageData, callback);
 }
 
 function sendTextMessage(recipientId, messageText) {
@@ -140,13 +142,15 @@ function sendTextMessage(recipientId, messageText) {
     callSendAPI(messageData);
 }
 
-function callSendAPI(messageData) {
+function callSendAPI(messageData, callback = function(){}) {
     request({
         uri: 'https://graph.facebook.com/v2.6/me/messages',
         qs: { access_token: ACCESS_TOKEN },
         method: 'POST',
         json: messageData
     }, function (error, response, body) {
+        callback();
+
         if (!error && response.statusCode == 200) {
             var recipientId = body.recipient_id;
             var messageId = body.message_id;
