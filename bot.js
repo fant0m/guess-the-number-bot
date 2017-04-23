@@ -31,7 +31,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/privacy-policy', function(req, res) {
-    res.send('');
+    res.status(200).send('Privacy policy');
 });
 
 app.get('/webhook', function(req, res) {
