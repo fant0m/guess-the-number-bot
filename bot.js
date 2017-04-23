@@ -27,7 +27,11 @@ userSchema.methods.generateNumber = function() {
 var User = mongoose.model('User', userSchema);
 
 app.get('/', function(req, res) {
-    res.send('it works');
+    res.send('magic');
+});
+
+app.get('/privacy-policy', function(req, res) {
+    res.send('');
 });
 
 app.get('/webhook', function(req, res) {
