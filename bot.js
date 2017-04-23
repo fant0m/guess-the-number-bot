@@ -114,9 +114,7 @@ function sendGenericMessage(recipientId, messageText) {
             id: recipientId
         },
         message: {
-            text: {
-                messageText
-            },
+            text: messageText,
             attachment: {
                 type: 'image',
                 payload: {
