@@ -102,8 +102,9 @@ function checkUserMessage(user, messageText) {
     } else if (check === user.number) {
         sendGenericMessage(user.id);
         user.generateNumber();
-        user.save();
-        sendTextMessage(user.id, 'Well played! You have successfully guessed the right number. New number has been generated.');
+        user.save().then(function() {
+            sendTextMessage(user.id, 'Well played! You have successfully guessed the right number. New number has been generated.');
+        });
     } else {
         sendTextMessage(user.id, 'Hmm.');
     }
