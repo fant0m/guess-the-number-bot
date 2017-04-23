@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const request = require('request');
 const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 require('dotenv').config();
 
@@ -68,11 +69,47 @@ function receivedMessage(event) {
     var messageAttachments = message.attachments;
 
     if (messageText) {
-        sendTextMessage(senderID, messageText);
+        getUser(senderID, function(user) {
+            checkUserMessage(user, messageText);
+        });
     }
 }
 
-function sendGenericMessage(recipientId, messageText) {
+function getUser(recipientId, callback) {
+    User.findOne({id: recipientId}).then(user => {
+        if (user) {
+            callback(user);
+        } else {
+            User.create({id: recipientId}).then(user => {
+                user.generateNumber();
+                user.save().then(user => {
+                    callback(user);
+                });
+            });
+        }
+    });
+}
+
+function checkUserMessage(user, messageText) {
+    var check = parseInt(messageText);
+
+    if (!check || isNaN(check)) {
+        sendTextMessage(user.id, 'Please guess the number between 1 and 1000.');
+    } else if (check < user.number) {
+        sendTextMessage(user.id, 'Your number is smaller than the chosen one.');
+    } else if (check > user.number) {
+        sendTextMessage(user.id, 'Your number is bigger than the chosen one.');
+    } else if (check === user.number) {
+        sendGenericMessage(user.id);
+        user.generateNumber();
+        user.save();
+        sendTextMessage(user.id, 'Well played! You have successfully guessed the right number.');
+    } else {
+        sendTextMessage(user.id, 'Hmm.');
+    }
+}
+
+function sendGenericMessage(recipientId) {
     var messageData = {
         recipient: {
             id: recipientId
@@ -120,40 +157,16 @@ function sendGenericMessage(recipientId, messageText) {
 }
 
 function sendTextMessage(recipientId, messageText) {
-    User.findOne({id: recipientId}, function(user) {
-        if (user) {
-            var messageResult = checkMessage(messageText, user.number);
-
-            if (parseInt(messageText) === user.number) {
-                sendGenericMessage();
-                user.generateNumber();
-                user.save();
-            }
-        } else {
-            User.create({id: recipientId}).then(function(user) {
-                user.generateNumber();
-
-                var messageResult = checkMessage(messageText, user.number);
-                if (parseInt(messageText) === user.number) {
-                    sendGenericMessage();
-                    user.generateNumber();
-                }
-
-                user.save();
-            });
+    var messageData = {
+        recipient: {
+            id: recipientId
+        },
+        message: {
+            text: messageText
         }
-    }).then(function(user) {
-        var messageData = {
-            recipient: {
-                id: recipientId
-            },
-            message: {
-                text: messageResult
-            }
-        };
+    };
 
-        callSendAPI(messageData);
-    });
+    callSendAPI(messageData);
 }
 
 function callSendAPI(messageData) {
@@ -175,20 +188,4 @@ function callSendAPI(messageData) {
             console.error(error);
         }
     });  
-}
-
-function checkMessage(message, number) {
-    var message = parseInt(message);
-
-    if (!message || isNan(message)) {
-        return 'Please guess the number between 1 and 1000.';
-    } else if (message < number) {
-        return 'Your number is smaller than the chosen one.';
-    } else if (message > number) {
-        return 'Your number is bigger than the chosen one.';
-    } else if (message == number) {
-        return 'Well played! You have successfully guessed the right number.';
-    } else {
-        return 'Hmm.';
-    }
 }
