@@ -100,22 +100,23 @@ function checkUserMessage(user, messageText) {
     } else if (check > user.number) {
         sendTextMessage(user.id, 'Your number is bigger than the chosen one.');
     } else if (check === user.number) {
-        sendGenericMessage(user.id);
+        sendGenericMessage(user.id, 'Well played! You have successfully guessed the right number. New number has been generated.');
         user.generateNumber();
-        user.save().then(function() {
-            sendTextMessage(user.id, 'Well played! You have successfully guessed the right number. New number has been generated.');
-        });
+        user.save();
     } else {
         sendTextMessage(user.id, 'Hmm.');
     }
 }
 
-function sendGenericMessage(recipientId) {
+function sendGenericMessage(recipientId, messageText) {
     var messageData = {
         recipient: {
             id: recipientId
         },
         message: {
+            text: {
+                messageText
+            },
             attachment: {
                 type: 'image',
                 payload: {
