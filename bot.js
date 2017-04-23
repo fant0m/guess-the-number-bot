@@ -26,12 +26,15 @@ userSchema.methods.generateNumber = function() {
 };
 var User = mongoose.model('User', userSchema);
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
 app.get('/', function(req, res) {
     res.send('magic');
 });
 
 app.get('/privacy-policy', function(req, res) {
-    res.status(200).send('Privacy policy');
+   res.render('privacy-policy');
 });
 
 app.get('/webhook', function(req, res) {
